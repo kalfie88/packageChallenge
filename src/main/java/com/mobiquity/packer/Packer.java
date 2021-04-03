@@ -13,9 +13,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Packer {
 
-    private static final FileProcessor fileProcessor = new FileProcessor();
-    private static final PackageSorter packageSorter = new PackageSorter();
-
     /**
      * Entry of the solution, this method is in charge of processing the inputs
      * and outputs and call the class responsible of running the algorithm
@@ -27,6 +24,9 @@ public class Packer {
     public static String pack(String filePath) throws APIException {
         if (filePath == null || filePath.isEmpty())
             throw new APIException("File name should not be empty");
+
+        FileProcessor fileProcessor = new FileProcessor();
+        PackageSorter packageSorter = new PackageSorter();
 
         List<List<String>> result = new ArrayList<>();
         List<Pack> packs = fileProcessor.processInput(filePath);
