@@ -7,69 +7,100 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-//@ExtendWith(MockitoExtension.class)
 class PackageFillerTest {
 
-    private final PackageSorter packageFiller = new PackageSorter();
+    @InjectMocks
+    private PackageSorter packageSorter;
+
     private Pack pack;
+    private Pack pack1;
+    private Pack pack2;
+
+    List<String> result;
+    List<String> result1;
+    List<String> result2;
 
     @BeforeEach
     void setUp() {
-        //(1,85.31,€29) (2,14.55,€74) (3,3.98,€16) (4,26.24,€55) (5,63.69,€52) (6,76.25,€75) (7,60.02,€74)
-        // (8,93.18,€35) (9,89.95,€78)
-        Item i = Item.builder().id(1).weight(85.31).value(29).build();
-        Item i1 = Item.builder().id(2).weight(14.55).value(74).build();
-        Item i2 = Item.builder().id(3).weight(3.98).value(16).build();
-        Item i3 = Item.builder().id(4).weight(26.24).value(55).build();
-        Item i4 = Item.builder().id(5).weight(63.69).value(52).build();
-        Item i5 = Item.builder().id(6).weight(76.25).value(75).build();
-        Item i6 = Item.builder().id(7).weight(60.02).value(74).build();
-        Item i7 = Item.builder().id(8).weight(93.18).value(35).build();
-        Item i8 = Item.builder().id(9).weight(89.95).value(78).build();
+        MockitoAnnotations.initMocks(this);
 
-        List<Item> list = Arrays.asList(i, i1, i2, i3, i4, i5, i6, i7, i8);
-        pack = Pack.builder().capacity(75).itemsToChoose(list).build();
+        Item i = Item.builder().id(1).weight(53.38).cost(45).build();
+        Item i1 = Item.builder().id(2).weight(88.62).cost(98).build();
+        Item i2 = Item.builder().id(3).weight(78.48).cost(3).build();
+        Item i3 = Item.builder().id(4).weight(72.30).cost(76).build();
+        Item i4 = Item.builder().id(5).weight(30.18).cost(9).build();
+        Item i5 = Item.builder().id(6).weight(46.34).cost(48).build();
 
+        List<Item> itemList = Arrays.asList(i, i1, i2, i3, i4, i5);
+        pack = Pack.builder()
+                .capacity(81)
+                .itemsToChoose(itemList)
+                .build();
 
-        //(1,53.38,€45) (2,88.62,€98) (3,78.48,€3) (4,72.30,€76) (5,30.18,€9) (6,46.34,€48)
-        Item j = Item.builder().id(1).weight(53.38).value(45).build();
-        Item j1 = Item.builder().id(2).weight(88.62).value(98).build();
-        Item j2 = Item.builder().id(3).weight(78.48).value(3).build();
-        Item j3 = Item.builder().id(4).weight(72.30).value(76).build();
-        Item j4 = Item.builder().id(5).weight(30.18).value(9).build();
-        Item j5 = Item.builder().id(6).weight(46.34).value(48).build();
+        Item j = Item.builder().id(1).weight(85.31).cost(29).build();
+        Item j1 = Item.builder().id(2).weight(14.55).cost(74).build();
+        Item j2 = Item.builder().id(3).weight(3.98).cost(16).build();
+        Item j3 = Item.builder().id(4).weight(26.24).cost(55).build();
+        Item j4 = Item.builder().id(5).weight(63.69).cost(52).build();
+        Item j5 = Item.builder().id(6).weight(76.25).cost(75).build();
+        Item j6 = Item.builder().id(7).weight(60.02).cost(74).build();
+        Item j7 = Item.builder().id(8).weight(93.18).cost(35).build();
+        Item j8 = Item.builder().id(9).weight(89.95).cost(78).build();
 
-        List<Item> list1 = Arrays.asList(j, j1, j2, j3, j4, j5);
-        Pack pack1 = Pack.builder().capacity(81).itemsToChoose(list1).build();
+        List<Item> itemList1 = Arrays.asList(j, j1, j2, j3, j4, j5, j6, j7, j8);
 
-        List<Integer> res1 = packageFiller.fillPackage(pack1);
+        pack1 = Pack.builder()
+                .capacity(75)
+                .itemsToChoose(itemList1)
+                .build();
+
+        Item m = Item.builder().id(1).weight(15.3).cost(34).build();
+
+        pack2 = Pack.builder()
+                .capacity(8)
+                .itemsToChoose(Collections.singletonList(m))
+                .build();
+
+        result = Collections.singletonList("4");
+        result1 = Arrays.asList("2", "7");
+        result2 = Collections.emptyList();
+
     }
 
     @AfterEach
     void tearDown() {
     }
 
-    @DisplayName("Single pack successful")
+    @DisplayName("Package with one item -> successful")
     @Test
     void fillPackage() {
-        List<Integer> res = packageFiller.fillPackage(pack);
-        List<Integer> expectedRes = Arrays.asList(7, 2);
-        assertEquals(res, expectedRes);
+        List<String> res = packageSorter.fillPackage(pack);
+        assertEquals(result, res);
 
     }
 
-    @DisplayName("Single pack failed")
+    @DisplayName("Package with two items -> successful")
     @Test
-    void fillPackage_failed() {
-        List<Integer> res = packageFiller.fillPackage(pack);
-        List<Integer> expectedRes = Arrays.asList(7, 2);
-        assertEquals(res, expectedRes);
+    void fillPackage_with_two_results() {
+        List<String> res = packageSorter.fillPackage(pack1);
+        assertEquals(result1, res);
+
+    }
+
+    @DisplayName("No items in package -> successful")
+    @Test
+    void fillPackage_with_no_results() {
+        List<String> res = packageSorter.fillPackage(pack2);
+        assertEquals(result2, res);
 
     }
 
