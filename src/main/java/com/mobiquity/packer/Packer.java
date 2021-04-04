@@ -7,6 +7,8 @@ import com.mobiquity.utils.FileProcessor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,14 +24,15 @@ public class Packer {
      * @throws APIException if fileName is incorrect
      */
     public static String pack(String filePath) throws APIException {
-        if (filePath == null || filePath.isEmpty())
-            throw new APIException("File name should not be empty");
-
         FileProcessor fileProcessor = new FileProcessor();
         PackageSorter packageSorter = new PackageSorter();
-
         List<List<String>> result = new ArrayList<>();
-        List<Pack> packs = fileProcessor.processInput(filePath);
+        Path path = Paths.get(filePath);
+
+        if (filePath.isEmpty() || !path.isAbsolute())
+            throw new APIException("File path is invalid");
+
+        List<Pack> packs = fileProcessor.processInput(path);
         packs.forEach(pack -> result.add(packageSorter.fillPackage(pack)));
 
         return fileProcessor.processOutput(result);

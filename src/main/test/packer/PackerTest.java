@@ -3,35 +3,32 @@ package packer;
 import com.mobiquity.entities.Item;
 import com.mobiquity.entities.Pack;
 import com.mobiquity.exception.APIException;
-import com.mobiquity.helper.PackageSorter;
 import com.mobiquity.packer.Packer;
 import com.mobiquity.utils.FileProcessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 class PackerTest {
 
     @Mock
-    private PackageSorter packageSorter;
-
-    @Mock
     private FileProcessor fileProcessor;
 
-    @InjectMocks
-    private Packer packer;
-
+    private static final String FILE_NAME = "src/main/resources/example_input";
     private StringBuilder expectedOutput;
 
     private List<Pack> expectedPacks;
@@ -115,16 +112,25 @@ class PackerTest {
     void tearDown() {
     }
 
-    @DisplayName("Packer run successful")
+    @DisplayName("Packer finds solutions to all packs")
     @Test
-    void pack() throws APIException {
-        String fileName = "example_input";
+    void whenPackerFindsSolutionsToAllPacks_thenReturnValidSolutions() throws APIException {
+        File file = new File(FILE_NAME);
+        String absolutePath = file.getAbsolutePath();
+        Path path = Paths.get(FILE_NAME);
 
-        when(fileProcessor.processInput(fileName)).thenReturn(expectedPacks);
-        //when(packageSorter.fillPackage(pack)).thenReturn(result);
+        when(fileProcessor.processInput(path)).thenReturn(expectedPacks);
         when(fileProcessor.processOutput(packageResult)).thenReturn(expectedOutput.toString());
-        String output = Packer.pack(fileName);
+        String output = Packer.pack(absolutePath);
 
         assertEquals(expectedOutput.toString(), output);
+    }
+
+    @DisplayName("Throws APIException when the path is not valid")
+    @Test
+    void whenPathIsInvalid_thenThrowException() {
+        Exception exception = assertThrows(APIException.class, () -> Packer.pack(FILE_NAME));
+
+        assertEquals("File path is invalid", exception.getMessage());
     }
 }

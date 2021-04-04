@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FileProcessorTest {
 
-    private String input;
+    private static final String FILE_NAME = "src/main/resources/example_input";
     private StringBuilder expectedOutputOne;
     private StringBuilder expectedOutputTwo;
 
@@ -28,7 +30,6 @@ class FileProcessorTest {
     private List<List<String>> packageResultTwo;
     private List<List<String>> packageResultNone;
 
-
     @InjectMocks
     FileProcessor fileProcessor;
 
@@ -37,8 +38,6 @@ class FileProcessorTest {
         MockitoAnnotations.initMocks(this);
 
         //Input tests
-        input = "example_input";
-
         Item i = Item.builder().id(1).weight(53.38).cost(45).build();
         Item i1 = Item.builder().id(2).weight(88.62).cost(98).build();
         Item i2 = Item.builder().id(3).weight(78.48).cost(3).build();
@@ -114,32 +113,40 @@ class FileProcessorTest {
     void tearDown() {
     }
 
+    @DisplayName("Process input file returns correct results")
     @Test
-    void processInput() {
-        List<Pack> packList = fileProcessor.processInput(input);
+    void whenInputFileIsProcess_thenReturnCorrectResults() {
+        Path path = Paths.get(FILE_NAME);
+        List<Pack> packList = fileProcessor.processInput(path);
         assertEquals(expectedPacks, packList);
     }
 
-    @DisplayName("Process output with 2 results -> successful")
+    @DisplayName("Process output with 2 results, returns result with 2 values in the string")
     @Test
-    void processOutput_with_two_results() {
+    void whenProcessingOutputWithTwoResults_thenReturnString() {
         String output = fileProcessor.processOutput(packageResultTwo);
         assertEquals(expectedOutputTwo.toString(), output);
     }
 
-    @DisplayName("Process output with 1 results -> successful")
+    @DisplayName("Process output with 1 results, returns result with 1 values in the string")
     @Test
-    void processOutput_with_one_result() {
+    void whenProcessingOutputWithOneResult_thenReturnString() {
         String output = fileProcessor.processOutput(packageResultOne);
         assertEquals(output, expectedOutputOne.toString());
     }
 
-    @DisplayName("Process output with NO results -> successful")
+    @DisplayName("Process output with NO results, return string with -")
     @Test
-    void processOutput_with_no_results() {
+    void whenProcessingOutputWithNoResults_thenReturnStringWithDash() {
         String expected = "-" + "\n";
         String output = fileProcessor.processOutput(packageResultNone);
         assertEquals(expected, output);
     }
 
+    @DisplayName("Process empty result list, return empty string")
+    @Test
+    void whenProcessingEmptyResultList_thenReturnEmptyString() {
+        String output = fileProcessor.processOutput(Collections.emptyList());
+        assertEquals("", output);
+    }
 }

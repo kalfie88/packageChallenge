@@ -2,13 +2,14 @@ package com.mobiquity.utils;
 
 import com.mobiquity.entities.Item;
 import com.mobiquity.entities.Pack;
+import com.mobiquity.exception.APIException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,15 +24,13 @@ public class FileProcessor {
      * Method to process the input, so reads the file line by line,
      * and then maps the packs on the list.
      *
-     * @param fileName absolute path to a file
+     * @param path absolute path to a file
      * @return list of packs to sort
      */
-    public List<Pack> processInput(String fileName) {
-        try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
+    public List<Pack> processInput(Path path) {
+        try (Stream<String> stream = Files.lines(path)) {
 
-            List<String> list = stream
-                    .filter(String::isEmpty)
-                    .collect(Collectors.toList());
+            List<String> list = stream.collect(Collectors.toList());
 
             return mapPacks(list);
 
@@ -54,12 +53,16 @@ public class FileProcessor {
     private List<Pack> mapPacks(List<String> list) {
         List<Pack> packs = new ArrayList<>();
 
+        if (list.isEmpty())
+            return Collections.emptyList();
+
         for (String line : list) {
             String[] splitLine = line.split(":"); // 0 -> capacity 1-> rest
-            String[] items = splitLine[1].split(" "); //each item within ()
+            String temp = splitLine[1].trim();
+            String[] items = temp.split(" "); //each item within ()
 
             Pack newPack = Pack.builder()
-                    .capacity(Integer.parseInt(splitLine[0]))
+                    .capacity(Integer.parseInt(splitLine[0].trim()))
                     .itemsToChoose(mapItems(items))
                     .build();
 
@@ -79,15 +82,17 @@ public class FileProcessor {
     @NotNull
     private List<Item> mapItems(String[] items) {
         List<Item> itemList = new ArrayList<>();
+        if (items.length == 0)
+            return Collections.emptyList();
 
         for (String item : items) {
             item = item.replaceAll("[()|€]", " "); //Without () and €
             String[] splitItem = item.split(","); //clean items
 
             Item newItem = Item.builder()
-                    .id(Integer.parseInt(splitItem[0]))
-                    .weight(Double.parseDouble(splitItem[1]))
-                    .cost(Integer.parseInt(splitItem[2]))
+                    .id(Integer.parseInt(splitItem[0].trim()))
+                    .weight(Double.parseDouble(splitItem[1].trim()))
+                    .cost(Integer.parseInt(splitItem[2].trim()))
                     .build();
 
             itemList.add(newItem);
@@ -105,6 +110,9 @@ public class FileProcessor {
      */
     public String processOutput(@NotNull List<List<String>> result) {
         StringBuilder output = new StringBuilder();
+
+        if (result.isEmpty())
+            return "";
 
         result.stream()
                 .filter(Objects::nonNull)

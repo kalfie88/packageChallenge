@@ -24,10 +24,12 @@ class PackageFillerTest {
     private Pack pack;
     private Pack pack1;
     private Pack pack2;
+    private Pack pack3;
 
-    List<String> result;
-    List<String> result1;
-    List<String> result2;
+    List<String> resultWithOneItem;
+    List<String> resultWithTwoItems;
+    List<String> resultWithNoItems;
+    List<String> resultWithTwoSolutions;
 
     @BeforeEach
     void setUp() {
@@ -70,9 +72,27 @@ class PackageFillerTest {
                 .itemsToChoose(Collections.singletonList(m))
                 .build();
 
-        result = Collections.singletonList("4");
-        result1 = Arrays.asList("2", "7");
-        result2 = Collections.emptyList();
+        Item k = Item.builder().id(1).weight(90.72).cost(13).build();
+        Item k1 = Item.builder().id(2).weight(33.80).cost(40).build();
+        Item k2 = Item.builder().id(3).weight(43.15).cost(10).build();
+        Item k3 = Item.builder().id(4).weight(37.97).cost(16).build();
+        Item k4 = Item.builder().id(5).weight(46.81).cost(36).build();
+        Item k5 = Item.builder().id(6).weight(48.77).cost(79).build();
+        Item k6 = Item.builder().id(7).weight(81.80).cost(45).build();
+        Item k7 = Item.builder().id(8).weight(19.36).cost(79).build();
+        Item k8 = Item.builder().id(9).weight(6.76).cost(64).build();
+
+        List<Item> itemList2 = Arrays.asList(k, k1, k2, k3, k4, k5, k6, k7, k8);
+
+        pack3 = Pack.builder()
+                .capacity(56)
+                .itemsToChoose(itemList2)
+                .build();
+
+        resultWithOneItem = Collections.singletonList("4");
+        resultWithTwoItems = Arrays.asList("2", "7");
+        resultWithNoItems = Collections.emptyList();
+        resultWithTwoSolutions = Arrays.asList("8", "9");
 
     }
 
@@ -80,27 +100,54 @@ class PackageFillerTest {
     void tearDown() {
     }
 
-    @DisplayName("Package with one item -> successful")
+    @DisplayName("Can only add one item to the package")
     @Test
-    void fillPackage() {
+    void whenSortedPackageHasOneItem_thenReturnOneIndex() {
         List<String> res = packageSorter.fillPackage(pack);
-        assertEquals(result, res);
+        assertEquals(resultWithOneItem, res);
 
     }
 
-    @DisplayName("Package with two items -> successful")
+    @DisplayName("Can add two items to the package")
     @Test
-    void fillPackage_with_two_results() {
+    void whenSortedPackageHasTwoItems_thenReturnBothIndexes() {
         List<String> res = packageSorter.fillPackage(pack1);
-        assertEquals(result1, res);
+        assertEquals(resultWithTwoItems, res);
 
     }
 
-    @DisplayName("No items in package -> successful")
+    @DisplayName("No solution was found so there's no items in package")
     @Test
-    void fillPackage_with_no_results() {
+    void whenSortingPackageWithNoSolution_thenReturnDash() {
         List<String> res = packageSorter.fillPackage(pack2);
-        assertEquals(result2, res);
+        assertEquals(resultWithNoItems, res);
+
+    }
+
+    @DisplayName("Package with two solutions, choose the one with less weight")
+    @Test
+    void whenSortedPackageHasTwoSolutions_thenReturnLessHeavyOne() {
+        List<String> res = packageSorter.fillPackage(pack3);
+        assertEquals(resultWithTwoSolutions, res);
+
+    }
+
+    @DisplayName("When pack is empty, should return empty list")
+    @Test
+    void whenSortingPackageWithEmptyPack_thenReturnEmptyList() {
+        List<String> res = packageSorter.fillPackage(null);
+        assertEquals(Collections.emptyList(), res);
+
+    }
+
+    @DisplayName("No items to choose from, should return empty list")
+    @Test
+    void whenSortingPackageWithEmptyItems_thenReturnEmptyList() {
+        List<String> res = packageSorter.fillPackage(Pack.builder()
+                .capacity(10)
+                .itemsToChoose(Collections.emptyList())
+                .build());
+        assertEquals(Collections.emptyList(), res);
 
     }
 
