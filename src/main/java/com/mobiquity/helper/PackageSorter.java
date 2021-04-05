@@ -63,6 +63,7 @@ public class PackageSorter {
 
         for (int i = 1; i <= items; i++) {
             for (int j = 0; j <= capacity; j++) {
+
                 if (weights.get(i - 1) > j)
                     matrix[i][j] = matrix[i - 1][j];
                 else
@@ -79,15 +80,15 @@ public class PackageSorter {
      * @return list of items that go in the package
      */
     private List<String> getItems() {
-        int maxValue = matrix[items][capacity];
+        int maxCost = matrix[items][capacity];
         int weightCapacity = capacity;
         List<String> results = new ArrayList<>();
 
-        for (int i = items; i > 0 && maxValue > 0; i--) {
-            if (maxValue != matrix[i - 1][weightCapacity]) {
+       for (int i = items; i > 0 && maxCost > 0; i--) {
+            if (maxCost != matrix[i-1][weightCapacity]) {
                 results.add(String.valueOf(i));
-                maxValue -= values.get(i - 1);
-                weightCapacity -= weights.get(i - 1).intValue();
+                maxCost -= values.get(i-1);
+                weightCapacity -= weights.get(i-1).intValue();
             }
         }
 
