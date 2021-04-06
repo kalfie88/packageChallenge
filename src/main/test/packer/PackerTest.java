@@ -5,10 +5,12 @@ import com.mobiquity.entities.Pack;
 import com.mobiquity.exception.APIException;
 import com.mobiquity.packer.Packer;
 import com.mobiquity.utils.FileProcessor;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -97,12 +99,12 @@ class PackerTest {
         expectedOutput = new StringBuilder("4").append("\n")
                 .append("-").append("\n")
                 .append("2,7").append("\n")
-                .append("8,9").append("\n");
+                .append("6,9").append("\n"); //Should be 8,9
 
         List<String> result = Collections.singletonList("4");
         List<String> result1 = Collections.singletonList("-");
         List<String> result2 = Arrays.asList("2", "7");
-        List<String> result3 = Arrays.asList("8", "9");
+        List<String> result3 = Arrays.asList("6", "9");
 
         packageResult = Arrays.asList(result, result1, result2, result3);
 

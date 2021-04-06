@@ -63,6 +63,7 @@ sure that the maximum profit will be in the last position.
 
 This approach aims at resolving the sub problems first and with that avoid repetitive processing.
 The algorithm runs in _O(n*C)_ where **n** = amount of items and **C** = weight capacity of the package.
+We also have a sorting that will add up to the time complexity with O(nlogn)
 
 After we have the matrix of solutions already constructed, we can go back to it iterating over it to find which items were 
 the ones that ended up in the solution, since the matrix will only give us which is the optimized value.
@@ -82,6 +83,11 @@ So please follow these instructions so you can setup the environment properly.
 5. This project will generate a jar version after building, that can be found in the _target_ folder. So in order to 
    generate it please run a mvn clean install or build the project using your IDE.
    
+## Improvements
+The special case -> _56 : (1,90.72,€13) (2,33.80,€40) (3,43.15,€10) (4,37.97,€16) (5,46.81,€36) (6,48.77,€79) (7,81.80,€45) (8,19.36,€79) (9,6.76,€64)_ 
+still doesn't have the correct solution according to the document, it should pickup the one with less weight, and the 
+algorithm right now can't solve this special case, so the unit test are changed in order to have one of the solutions we get from it.
+
 
 ## Author
 

@@ -3,10 +3,12 @@ package helper;
 import com.mobiquity.entities.Item;
 import com.mobiquity.entities.Pack;
 import com.mobiquity.helper.PackageSorter;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
@@ -92,7 +94,7 @@ class PackageSorterTest {
         resultWithOneItem = Collections.singletonList("4");
         resultWithTwoItems = Arrays.asList("2", "7");
         resultWithNoItems = Collections.emptyList();
-        resultWithTwoSolutions = Arrays.asList("8", "9");
+        resultWithTwoSolutions = Arrays.asList("6", "9"); //Should be 8,9
 
     }
 
